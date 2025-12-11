@@ -9,13 +9,33 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
-app.use(cors()); // allow all origins (ok for demo). Lock to your Vercel domain in production
+// allow setting frontend origin via env (set this in Render: FRONTEND_URL=https://<your-vercel>.vercel.app)
+const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://fubotics-assignment-lakshmi-prabha.vercel.app';
+
+// CORS config (explicit)
+const corsOptions = {
+  origin: FRONTEND_ORIGIN,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204,
+};
+
+// apply CORS middleware
+app.use(cors(corsOptions));
+
+// ensure preflight requests are handled
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 
-// Health endpoint required by Render's health check
-app.get('/healthz', (req, res) => {
-  return res.status(200).send('ok');
+// simple request logger to help debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url} - origin: ${req.get('Origin')}`);
+  next();
 });
+
+// Health endpoint required by Render's health check
+app.get('/healthz', (req, res) => res.status(200).send('ok'));
 
 // read messages file (create file if not exist)
 async function readMessages() {
@@ -23,7 +43,6 @@ async function readMessages() {
     const txt = await fs.readFile(MESSAGES_FILE, 'utf8');
     return JSON.parse(txt || '[]');
   } catch (err) {
-    // if file does not exist create it
     await fs.writeFile(MESSAGES_FILE, '[]', 'utf8');
     return [];
   }
@@ -33,9 +52,8 @@ async function writeMessages(msgs) {
   await fs.writeFile(MESSAGES_FILE, JSON.stringify(msgs, null, 2), 'utf8');
 }
 
-// Simple mock AI reply — replace with real AI call later
+// Simple mock AI reply
 async function getAIReply(userText) {
-  // simple echo (OK for demo). Replace this function to call OpenAI or other AI.
   return `Echo: ${userText}`;
 }
 
@@ -50,7 +68,7 @@ app.get('/api/messages', async (req, res) => {
   }
 });
 
-// POST a new user message, then add AI reply
+// POST a new user message
 app.post('/api/messages', async (req, res) => {
   try {
     const { author, text } = req.body;
@@ -60,7 +78,6 @@ app.post('/api/messages', async (req, res) => {
     const userMsg = { id: Date.now() + '-u', author, text, timestamp: new Date().toISOString() };
     msgs.push(userMsg);
 
-    // get AI reply
     const aiText = await getAIReply(text);
     const aiMsg = { id: Date.now() + '-a', author: 'ai', text: aiText, timestamp: new Date().toISOString() };
     msgs.push(aiMsg);
@@ -73,7 +90,7 @@ app.post('/api/messages', async (req, res) => {
   }
 });
 
-// Start server (must use process.env.PORT on Render)
+// start server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
