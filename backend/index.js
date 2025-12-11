@@ -1,4 +1,4 @@
-// index.js
+// backend/index.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -9,8 +9,13 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
-app.use(cors());
+app.use(cors()); // allow all origins (ok for demo). Lock to your Vercel domain in production
 app.use(express.json());
+
+// Health endpoint required by Render's health check
+app.get('/healthz', (req, res) => {
+  return res.status(200).send('ok');
+});
 
 // read messages file (create file if not exist)
 async function readMessages() {
@@ -18,7 +23,7 @@ async function readMessages() {
     const txt = await fs.readFile(MESSAGES_FILE, 'utf8');
     return JSON.parse(txt || '[]');
   } catch (err) {
-    // if file not exists create
+    // if file does not exist create it
     await fs.writeFile(MESSAGES_FILE, '[]', 'utf8');
     return [];
   }
@@ -36,28 +41,39 @@ async function getAIReply(userText) {
 
 // GET all messages
 app.get('/api/messages', async (req, res) => {
-  const msgs = await readMessages();
-  res.json(msgs);
+  try {
+    const msgs = await readMessages();
+    res.json(msgs);
+  } catch (err) {
+    console.error('Read messages error:', err);
+    res.status(500).json({ error: 'Failed to read messages' });
+  }
 });
 
 // POST a new user message, then add AI reply
 app.post('/api/messages', async (req, res) => {
-  const { author, text } = req.body;
-  if (!author || !text) return res.status(400).json({ error: 'author and text required' });
+  try {
+    const { author, text } = req.body;
+    if (!author || !text) return res.status(400).json({ error: 'author and text required' });
 
-  const msgs = await readMessages();
-  const userMsg = { id: Date.now() + '-u', author, text, timestamp: new Date().toISOString() };
-  msgs.push(userMsg);
+    const msgs = await readMessages();
+    const userMsg = { id: Date.now() + '-u', author, text, timestamp: new Date().toISOString() };
+    msgs.push(userMsg);
 
-  // get AI reply
-  const aiText = await getAIReply(text);
-  const aiMsg = { id: Date.now() + '-a', author: 'ai', text: aiText, timestamp: new Date().toISOString() };
-  msgs.push(aiMsg);
+    // get AI reply
+    const aiText = await getAIReply(text);
+    const aiMsg = { id: Date.now() + '-a', author: 'ai', text: aiText, timestamp: new Date().toISOString() };
+    msgs.push(aiMsg);
 
-  await writeMessages(msgs);
-  res.json({ user: userMsg, ai: aiMsg });
+    await writeMessages(msgs);
+    res.json({ user: userMsg, ai: aiMsg });
+  } catch (err) {
+    console.error('Post message error:', err);
+    res.status(500).json({ error: 'Failed to save message' });
+  }
 });
 
+// Start server (must use process.env.PORT on Render)
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });
