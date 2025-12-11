@@ -20,10 +20,8 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// apply CORS middleware
+// apply CORS middleware and handle preflight
 app.use(cors(corsOptions));
-
-// ensure preflight requests are handled
 app.options('*', cors(corsOptions));
 
 app.use(express.json());
@@ -52,7 +50,7 @@ async function writeMessages(msgs) {
   await fs.writeFile(MESSAGES_FILE, JSON.stringify(msgs, null, 2), 'utf8');
 }
 
-// Simple mock AI reply
+// Simple mock AI reply — replace with real AI call later
 async function getAIReply(userText) {
   return `Echo: ${userText}`;
 }
