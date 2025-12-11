@@ -9,10 +9,8 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
-// allow setting frontend origin via env (set this in Render: FRONTEND_URL=https://<your-vercel>.vercel.app)
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://fubotics-assignment-lakshmi-prabha.vercel.app';
 
-// CORS config (explicit)
 const corsOptions = {
   origin: FRONTEND_ORIGIN,
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -20,9 +18,8 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// apply CORS middleware and handle preflight
+// apply CORS middleware (global - handles preflight)
 app.use(cors(corsOptions));
-app.options('/api/*', cors(corsOptions));
 
 app.use(express.json());
 
@@ -35,7 +32,6 @@ app.use((req, res, next) => {
 // Health endpoint required by Render's health check
 app.get('/healthz', (req, res) => res.status(200).send('ok'));
 
-// read messages file (create file if not exist)
 async function readMessages() {
   try {
     const txt = await fs.readFile(MESSAGES_FILE, 'utf8');
@@ -50,12 +46,10 @@ async function writeMessages(msgs) {
   await fs.writeFile(MESSAGES_FILE, JSON.stringify(msgs, null, 2), 'utf8');
 }
 
-// Simple mock AI reply — replace with real AI call later
 async function getAIReply(userText) {
   return `Echo: ${userText}`;
 }
 
-// GET all messages
 app.get('/api/messages', async (req, res) => {
   try {
     const msgs = await readMessages();
@@ -66,7 +60,6 @@ app.get('/api/messages', async (req, res) => {
   }
 });
 
-// POST a new user message
 app.post('/api/messages', async (req, res) => {
   try {
     const { author, text } = req.body;
@@ -88,8 +81,6 @@ app.post('/api/messages', async (req, res) => {
   }
 });
 
-// start server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
-
