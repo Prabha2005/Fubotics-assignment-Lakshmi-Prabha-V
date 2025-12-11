@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1765439589902-u",
+    "author": "user",
+    "text": "Hello",
+    "timestamp": "2025-12-11T07:53:09.902Z"
+  },
+  {
+    "id": "1765439589903-a",
+    "author": "ai",
+    "text": "Echo: Hello",
+    "timestamp": "2025-12-11T07:53:09.903Z"
+  },
+  {
+    "id": "1765439871307-u",
+    "author": "user",
+    "text": "Hello from curl",
+    "timestamp": "2025-12-11T07:57:51.307Z"
+  },
+  {
+    "id": "1765439871308-a",
+    "author": "ai",
+    "text": "Echo: Hello from curl",
+    "timestamp": "2025-12-11T07:57:51.308Z"
+  },
+  {
+    "id": "1765439928252-u",
+    "author": "user",
+    "text": "Hi",
+    "timestamp": "2025-12-11T07:58:48.252Z"
+  },
+  {
+    "id": "1765439928253-a",
+    "author": "ai",
+    "text": "Echo: Hi",
+    "timestamp": "2025-12-11T07:58:48.253Z"
+  },
+  {
+    "id": "1765439980403-u",
+    "author": "user",
+    "text": "Hello prabha!",
+    "timestamp": "2025-12-11T07:59:40.403Z"
+  },
+  {
+    "id": "1765439980403-a",
+    "author": "ai",
+    "text": "Echo: Hello prabha!",
+    "timestamp": "2025-12-11T07:59:40.403Z"
+  }
+]
