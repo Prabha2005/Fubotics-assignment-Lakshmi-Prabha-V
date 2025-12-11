@@ -4,9 +4,11 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
 
+  const API = "https://fubotics-assignment-lakshmi-prabha-v.onrender.com";
+
   // ⬇ FETCH HISTORY ON PAGE LOAD
   useEffect(() => {
-    fetch("http://localhost:4000/api/messages")
+    fetch(`${API}/api/messages`)
       .then((r) => r.json())
       .then((data) => setMessages(data))
       .catch((err) => console.error("Fetch error:", err));
@@ -18,7 +20,7 @@ function App() {
 
     const body = { author: "user", text };
 
-    const res = await fetch("http://localhost:4000/api/messages", {
+    const res = await fetch(`${API}/api/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -63,3 +65,4 @@ function App() {
 }
 
 export default App;
+
