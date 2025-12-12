@@ -7,15 +7,15 @@ Features message saving, CORS support, and environment-based configuration.
 
 # backend .env
 PORT=4000
-FRONTEND_URL=http://localhost:3000
-
-# frontend .env
 REACT_APP_BACKEND_URL=http://localhost:4000
 
+# frontend .env
+FRONTEND_URL=http://localhost:3000
 
-![Image](https://github.com/username/repo-name/blob/main/assets/logo.png?raw=1)
+![Image](https://res.cloudinary.com/daj3srtxk/image/upload/v1765512686/chat_ai_stbncb.png)
 
-![Image]("C:\Users\poovi\OneDrive\Pictures\Fubotics\chat_ai.png")
+
+
 
 
 
